@@ -4,9 +4,47 @@
 #include "gba.h"
 
 typedef struct {
+
+   int height;
+   int width;
+
+   int x;
+   int y;
+
+   int justMovedRight;
+   int justMovedLeft;
+   int justMovedUp;
+   int justMovedDown;
+ } Mario;
+
+ typedef struct {
+
+   int x;
+   int y;
+   int justMovedRight;
+   int justMovedLeft;
+ } Ground;
+
+typedef struct {
+    int height;
+    int width;
+    int x;
+    int y;
+    int isPopped;
+    int justMovedRight;
+    int justMovedLeft;
+    int startX;
+    int isOnScreen;
+ } Block;
+
+typedef struct {
     // Store whether or not the game is over in this member:
     int gameOver;
+    int score;
+    int scoreJustChanged;
 
+    int x;
+    int lengthOfLevel;
     /*
     * TA-TODO: Add any logical elements you need to keep track of in your app.
     *
@@ -17,6 +55,10 @@ typedef struct {
     * int points;
     *
     */
+    Mario mario;
+    Ground ground;
+    Block *block;
+    Block *brick_block;
 
 } AppState;
 
@@ -31,8 +73,6 @@ typedef struct {
 *   int x;
 *   int y;
 * } Snake;
-*
-*/
 typedef struct {
 
    int height;
@@ -41,19 +81,11 @@ typedef struct {
    int x;
    int y;
  } Mario;
+*
+*/
 
- typedef struct {
-   int x;
-   int y;
- } Ground;
 
-typedef struct {
-    int height;
-   int width;
-   int x;
-   int y;
-   int isPopped;
- } Block;
+
 
 // This function can initialize an unused AppState struct.
 void initializeAppState(AppState *appState);

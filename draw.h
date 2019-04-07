@@ -36,4 +36,5 @@ void undrawBlockMarioMovedLeft(Block *block);
 void drawBlockJump(Block *block);
 void undrawBlockMovedUp(Block *block);
 void undrawBlockMovedDown(Block *block);
+void drawBrickBlock(Block *block);
 #endif

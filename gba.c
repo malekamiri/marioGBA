@@ -67,7 +67,7 @@ void drawChar(int col, int row, char ch, u16 color) {
     for(int r = 0; r<8; r++) {
         for(int c=0; c<6; c++) {
             if(fontdata_6x8[OFFSET(r, c, 6) + ch*48]) {
-                setPixel(col+c, row+r, color);
+                setPixel(row+r, col+c, color);
             }
         }
     }

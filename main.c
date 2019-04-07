@@ -33,27 +33,10 @@ int main(void) {
 
     GBAState state = START;
 
-    Mario mario;
-    mario.width = 35;
-    mario.height = 35;
-    mario.x = 95;
-    mario.y = 40;
-
-    Ground ground;
-    ground.x = 130;
-    ground.y = 0;
-
-    Block block;
-    block.x = 58;
-    block.y = 130;
-    block.width = 15;
-    block.height = 15;
-    block.isPopped = 0;
-
-    int score = 0;
 
     // We store the "previous" and "current" states.
     AppState currentAppState, nextAppState;
+
 
     // We store the current and previous values of the button input.
     u32 previousButtons = BUTTONS;
@@ -87,9 +70,9 @@ int main(void) {
             case APP_INIT:
 
                 fillScreenDMA(BACKGROUND);
-                drawGround(&ground);
-                drawMario(&mario);
-                drawBlock(&block);
+                // drawGround(&ground);
+                //drawMario(&mario);
+                // drawBlock(&block);
 
 
                 // Initialize the app. Switch to the APP state.
@@ -102,33 +85,7 @@ int main(void) {
                 break;
             case APP:
 
-                if (KEY_DOWN((BUTTON_RIGHT), currentButtons)) {
-                        // drawMarioMovedRight(&mario);
-                        // waitForVBlank();
-                        // undrawMarioMovedRight(&mario);
-                        drawGroundMarioMovedRight(&ground);
-                        drawBlockMarioMovedRight(&block);
-                        undrawBlockMarioMovedRight(&block);
-                }
-                if (KEY_DOWN((BUTTON_LEFT), currentButtons)) {
-                        // drawMarioMovedLeft(&mario);
-                        // waitForVBlank();
-                        // undrawMarioMovedLeft(&mario);
-                        drawGroundMarioMovedLeft(&ground);
-                        drawBlockMarioMovedLeft(&block);
-                        undrawBlockMarioMovedLeft(&block);
-                }
-                if (KEY_JUST_PRESSED((BUTTON_UP), currentButtons, previousButtons)) {
-                        if (mario.y > block.y - mario.width && mario.y < block.y + block.width + 1 && !block.isPopped) {
-                            drawMarioJump(&mario, &block);
-                        } else {
-                            drawMarioJump(&mario, 0);
-                        }
 
-                }
-                char buffer[51]; // draw the score
-                sprintf(buffer, "Score: %d", score);
-                drawString(5, 5, buffer, YELLOW);
                 // Process the app for one frame, store the next state
                 nextAppState = processAppState(&currentAppState, previousButtons, currentButtons);
 
@@ -136,7 +93,7 @@ int main(void) {
                 waitForVBlank();
 
                 // Undraw the previous state
-                undrawAppState(&currentAppState);
+                undrawAppState(&nextAppState);
 
                 // Draw the current state
                 drawAppState(&nextAppState);
