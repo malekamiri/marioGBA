@@ -19,11 +19,35 @@ typedef struct {
 
  typedef struct {
 
+   int height;
+   int width;
+
+   int x;
+   int y;
+
+   int startX;
+
+   int justMovedRight;
+   int justMovedLeft;
+   int justMovedUp;
+   int justMovedDown;
+ } Ennemy;
+
+ typedef struct {
+
    int x;
    int y;
    int justMovedRight;
    int justMovedLeft;
  } Ground;
+
+typedef struct {
+
+   int x;
+   int y;
+   int justMovedRight;
+   int justMovedLeft;
+ } Flag;
 
 typedef struct {
     int height;
@@ -35,11 +59,13 @@ typedef struct {
     int justMovedLeft;
     int startX;
     int isOnScreen;
+    int prize;
  } Block;
 
 typedef struct {
     // Store whether or not the game is over in this member:
     int gameOver;
+    int win;
     int score;
     int scoreJustChanged;
 
@@ -59,6 +85,8 @@ typedef struct {
     Ground ground;
     Block *block;
     Block *brick_block;
+    Ennemy *ennemy;
+    Flag *flag;
 
 } AppState;
 

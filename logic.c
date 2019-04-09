@@ -9,6 +9,7 @@ void initializeAppState(AppState* appState) {
     // Suppose the struct contains random values, make sure everything gets
     // the value it should have when the app begins.
     appState->gameOver = 0;
+    appState->win = 0;
     Mario mario;
     mario.width = 35;
     mario.height = 35;
@@ -40,6 +41,7 @@ void initializeAppState(AppState* appState) {
     block->justMovedLeft = 0;
     block->startX = 130;
     block->isOnScreen = 1;
+    block->prize = 1;
     appState->block = block;
 
 
@@ -56,12 +58,39 @@ void initializeAppState(AppState* appState) {
     brick_block->justMovedLeft = 0;
     brick_block->startX = 145;
     brick_block->isOnScreen = 1;
+    brick_block->prize = 0;
     appState->brick_block = brick_block;
+
+    Ennemy *ennemy = malloc(sizeof(Ennemy));
+    if (ennemy == 0) {
+        return;
+    }
+    ennemy->width = 18;
+    ennemy->height = 18;
+    ennemy->x = 112;
+    ennemy->y = 0;
+    ennemy->startX = 350;
+    ennemy->justMovedRight = 0;
+    ennemy->justMovedLeft = 0;
+    ennemy->justMovedUp = 0;
+    ennemy->justMovedDown = 0;
+    appState->ennemy = ennemy;
+
+
+    Flag *flag = malloc(sizeof(Flag));
+    if (flag == 0) {
+        return;
+    }
+    flag->x = 18;
+    flag->y = 205;
+    flag->justMovedRight = 0;
+    flag->justMovedLeft = 0;
+    appState->flag = flag;
 
     appState->score = 0;
     appState->scoreJustChanged = 0;
     appState->x = 0;
-    appState->lengthOfLevel = 300;
+    appState->lengthOfLevel = 800;
 
 }
 
@@ -113,6 +142,14 @@ AppState processAppState(AppState *currentAppState, u32 keysPressedBefore, u32 k
             currentAppState->ground.justMovedRight = 1;
             currentAppState->x += 1;
 
+            if (currentAppState->x + 240 >= currentAppState->lengthOfLevel) {
+                currentAppState->flag->y -= 1;
+            }
+            if (currentAppState->x + 100 >= currentAppState->lengthOfLevel) {
+                currentAppState->gameOver = 1;
+                currentAppState->win = 1;
+            }
+
             // if (currentAppState->block->y + currentAppState->block->startX < 0 || currentAppState->block->y + currentAppState->block->startX > 160) {
             //     currentAppState->block->isOnScreen = 0;
             // } else {
@@ -132,21 +169,41 @@ AppState processAppState(AppState *currentAppState, u32 keysPressedBefore, u32 k
 
             currentAppState->x -= 1;
 
+            if (currentAppState->x + 240 >= currentAppState->lengthOfLevel) {
+                currentAppState->flag->y += 1;
+            }
+
+            if (currentAppState->x + 100 >= currentAppState->lengthOfLevel) {
+                currentAppState->gameOver = 1;
+                currentAppState->win = 1;
+            }
+            if (currentAppState->x + 240 >= currentAppState->ennemy->startX) {
+                currentAppState->ennemy->y -= 3;
+            }
+
     }
     if (KEY_JUST_PRESSED((BUTTON_UP), keysPressedNow, keysPressedBefore)) {
-        if (currentAppState->mario.y > currentAppState->block->y + currentAppState->block->startX - currentAppState->mario.width && currentAppState->mario.y < currentAppState->block->y + currentAppState->block->startX + currentAppState->block->width + 1 && !currentAppState->block->isPopped) {
+        if (currentAppState->mario.y > currentAppState->block->y + currentAppState->block->startX - currentAppState->mario.width && currentAppState->mario.y < currentAppState->block->y + currentAppState->block->startX + currentAppState->block->width && !currentAppState->block->isPopped) {
             drawMarioJump(&(currentAppState->mario), (currentAppState->block));
             currentAppState->score += 1000;
             currentAppState->scoreJustChanged = 1;
-        } else if (currentAppState->mario.y > currentAppState->brick_block->y + currentAppState->brick_block->startX - currentAppState->mario.width && currentAppState->mario.y < currentAppState->brick_block->y + currentAppState->brick_block->startX + currentAppState->brick_block->width + 1 && !currentAppState->brick_block->isPopped) {
+        } else if (currentAppState->mario.y > currentAppState->brick_block->y + currentAppState->brick_block->startX - currentAppState->mario.width && currentAppState->mario.y < currentAppState->brick_block->y + currentAppState->brick_block->startX + currentAppState->brick_block->width && !currentAppState->brick_block->isPopped) {
             drawMarioJump(&(currentAppState->mario), (currentAppState->brick_block));
             currentAppState->score += 1000;
             currentAppState->scoreJustChanged = 1;
         } else {
             drawMarioJump(&(currentAppState->mario), 0);
         }
+        if (currentAppState->x + 240 >= currentAppState->ennemy->startX) {
+            currentAppState->ennemy->y += 1;
+        }
 
     }
+    if (currentAppState->x + 240 >= currentAppState->ennemy->startX) {
+        currentAppState->ennemy->y -= 1;
+    }
+
+
 
     AppState nextAppState = *currentAppState;
 

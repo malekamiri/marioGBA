@@ -37,4 +37,5 @@ void drawBlockJump(Block *block);
 void undrawBlockMovedUp(Block *block);
 void undrawBlockMovedDown(Block *block);
 void drawBrickBlock(Block *block);
+void drawEnnemy(Ennemy *ennemy);
 #endif

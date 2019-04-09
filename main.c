@@ -113,6 +113,7 @@ int main(void) {
 
                 // TA-TODO: Draw the exit / gameover screen
 
+
                 state = APP_EXIT_NODRAW;
                 break;
             case APP_EXIT_NODRAW:
