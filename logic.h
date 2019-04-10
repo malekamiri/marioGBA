@@ -32,8 +32,6 @@ typedef struct {
 
    int justMovedRight;
    int justMovedLeft;
-   int justMovedUp;
-   int justMovedDown;
  } Ennemy;
 
  typedef struct {

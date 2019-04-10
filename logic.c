@@ -74,8 +74,6 @@ void initializeAppState(AppState* appState) {
     ennemy->startX = 350;
     ennemy->justMovedRight = 0;
     ennemy->justMovedLeft = 0;
-    ennemy->justMovedUp = 0;
-    ennemy->justMovedDown = 0;
     appState->ennemy = ennemy;
 
 
