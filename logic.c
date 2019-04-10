@@ -19,6 +19,8 @@ void initializeAppState(AppState* appState) {
     mario.justMovedLeft = 0;
     mario.justMovedUp = 0;
     mario.justMovedDown = 0;
+    // mario.isJumpingUp = 0;
+    // mario.isJumpingDown = 0;
     appState->mario = mario;
 
     Ground ground;
@@ -91,6 +93,8 @@ void initializeAppState(AppState* appState) {
     appState->scoreJustChanged = 0;
     appState->x = 0;
     appState->lengthOfLevel = 800;
+
+    appState->reset = 0;
 
 }
 
@@ -201,10 +205,16 @@ AppState processAppState(AppState *currentAppState, u32 keysPressedBefore, u32 k
     }
     if (currentAppState->x + 240 >= currentAppState->ennemy->startX) {
         currentAppState->ennemy->y -= 1;
+        // if (currentAppState->x + 35 == currentAppState->ennemy->startX + currentAppState->ennemy->y) {
+        //     currentAppState->gameOver = 1;
+        // }
     }
 
 
+    if (KEY_JUST_PRESSED((BUTTON_SELECT), keysPressedNow, keysPressedBefore)) {
+        currentAppState->reset = 1;
 
+    }
     AppState nextAppState = *currentAppState;
 
     return nextAppState;

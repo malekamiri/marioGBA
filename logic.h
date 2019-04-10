@@ -15,6 +15,9 @@ typedef struct {
    int justMovedLeft;
    int justMovedUp;
    int justMovedDown;
+
+   // int isJumpingUp;
+   // int isJumpingDown;
  } Mario;
 
  typedef struct {
