@@ -47,8 +47,8 @@ int main(void) {
         currentButtons = BUTTONS;
 
 
-        if (KEY_JUST_PRESSED((BUTTON_SELECT), currentButtons, previousButtons)) {
-            initializeAppState(currentAppState);
+        if (currentAppState.win && !currentAppState.gameOver) {
+            initializeAppState(&currentAppState);
             state = START;
         }
         // TA-TODO: Manipulate the state machine below as needed.

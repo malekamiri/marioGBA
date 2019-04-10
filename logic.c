@@ -94,7 +94,7 @@ void initializeAppState(AppState* appState) {
     appState->x = 0;
     appState->lengthOfLevel = 800;
 
-    appState->reset = 0;
+    // appState->reset = 0;
 
 }
 
@@ -212,7 +212,8 @@ AppState processAppState(AppState *currentAppState, u32 keysPressedBefore, u32 k
 
 
     if (KEY_JUST_PRESSED((BUTTON_SELECT), keysPressedNow, keysPressedBefore)) {
-        currentAppState->reset = 1;
+        //if win is set to 1 but not gameOver. It means reset.
+        currentAppState->win = 1;
 
     }
     AppState nextAppState = *currentAppState;
