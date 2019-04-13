@@ -1,6 +1,6 @@
 #include "logic.h"
 #include "draw.h"
-
+#include "myLib.h"
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -9,6 +9,7 @@ void initializeAppState(AppState* appState) {
     // Suppose the struct contains random values, make sure everything gets
     // the value it should have when the app begins.
     appState->gameOver = 0;
+    appState->win = 0;
     Mario mario;
     mario.width = 35;
     mario.height = 35;
@@ -18,6 +19,8 @@ void initializeAppState(AppState* appState) {
     mario.justMovedLeft = 0;
     mario.justMovedUp = 0;
     mario.justMovedDown = 0;
+    mario.isJumpingUp = 0;
+    mario.isJumpingDown = 0;
     appState->mario = mario;
 
     Ground ground;
@@ -40,6 +43,7 @@ void initializeAppState(AppState* appState) {
     block->justMovedLeft = 0;
     block->startX = 130;
     block->isOnScreen = 1;
+    block->prize = 1;
     appState->block = block;
 
 
@@ -56,12 +60,57 @@ void initializeAppState(AppState* appState) {
     brick_block->justMovedLeft = 0;
     brick_block->startX = 145;
     brick_block->isOnScreen = 1;
+    brick_block->prize = 0;
     appState->brick_block = brick_block;
+
+    Ennemy *ennemy = malloc(sizeof(Ennemy));
+    if (ennemy == 0) {
+        return;
+    }
+    ennemy->width = 18;
+    ennemy->height = 18;
+    ennemy->x = 112;
+    ennemy->y = 0;
+    ennemy->startX = 350;
+    ennemy->justMovedRight = 0;
+    ennemy->justMovedLeft = 0;
+    ennemy->appeared = 0;
+    ennemy->dead = 0;
+    ennemy->realy = 0;
+    appState->ennemy = ennemy;
+
+
+    Flag *flag = malloc(sizeof(Flag));
+    if (flag == 0) {
+        return;
+    }
+    flag->x = 18;
+    flag->y = 205;
+    flag->justMovedRight = 0;
+    flag->justMovedLeft = 0;
+    appState->flag = flag;
+
+
+    Fireball *fireball = malloc(sizeof(Fireball));
+    if (brick_block == 0) {
+        return;
+    }
+    fireball->x = 115;
+    fireball->y = 65;
+    fireball->width = 8;
+    fireball->height = 8;
+    fireball->justMovedRight = 0;
+    fireball->justMovedLeft = 0;
+    fireball->startX = 0;
+    fireball->isOnScreen = 0;
+    appState->fireball = fireball;
 
     appState->score = 0;
     appState->scoreJustChanged = 0;
     appState->x = 0;
-    appState->lengthOfLevel = 300;
+    appState->lengthOfLevel = 600;
+
+    // appState->reset = 0;
 
 }
 
@@ -98,7 +147,31 @@ AppState processAppState(AppState *currentAppState, u32 keysPressedBefore, u32 k
      * Modifying the currentAppState will mean the undraw function will not be able
      * to undraw it later.
      */
+    if (currentAppState->mario.isJumpingUp < 7 && currentAppState->mario.isJumpingUp >= 1) {
+        currentAppState->mario.x -= 3;
+        currentAppState->mario.isJumpingUp += 1;
+        // undrawMarioMovedUp(&currentAppState->mario);
+    } else if (currentAppState->mario.isJumpingUp == 7 && currentAppState->mario.isJumpingDown == 0) {
+        currentAppState->mario.isJumpingDown = 1;
 
+        if (currentAppState->mario.y > currentAppState->block->y + currentAppState->block->startX - currentAppState->mario.width && currentAppState->mario.y < currentAppState->block->y + currentAppState->block->startX + currentAppState->block->width && !currentAppState->block->isPopped) {
+            drawBlockJump(currentAppState->block);
+            currentAppState->score += 1000;
+            currentAppState->scoreJustChanged = 1;
+        } else if (currentAppState->mario.y > currentAppState->brick_block->y + currentAppState->brick_block->startX - currentAppState->mario.width && currentAppState->mario.y < currentAppState->brick_block->y + currentAppState->brick_block->startX + currentAppState->brick_block->width && !currentAppState->brick_block->isPopped) {
+            drawBlockJump(currentAppState->brick_block);
+            currentAppState->score += 1000;
+            currentAppState->scoreJustChanged = 1;
+        }
+
+    } else if (currentAppState->mario.isJumpingDown < 8 && currentAppState->mario.isJumpingDown >= 1) {
+        currentAppState->mario.x += 3;
+        currentAppState->mario.isJumpingDown += 1;
+        undrawMarioMovedDown(&currentAppState->mario);
+    } else {
+        currentAppState->mario.isJumpingUp = 0;
+        currentAppState->mario.isJumpingDown = 0;
+    }
 
     if (KEY_DOWN((BUTTON_RIGHT), keysPressedNow)) {
 
@@ -113,6 +186,26 @@ AppState processAppState(AppState *currentAppState, u32 keysPressedBefore, u32 k
             currentAppState->ground.justMovedRight = 1;
             currentAppState->x += 1;
 
+            if (currentAppState->x + 240 >= currentAppState->lengthOfLevel) {
+                currentAppState->flag->y -= 1;
+                currentAppState->flag->justMovedRight = 1;
+            }
+            if (currentAppState->x + 100 >= currentAppState->lengthOfLevel) {
+                currentAppState->gameOver = 1;
+                currentAppState->win = 1;
+            }
+            if (!currentAppState->ennemy->dead && (currentAppState->ennemy->appeared || currentAppState->x + 240 >= currentAppState->ennemy->startX)) {
+                if (currentAppState->ennemy->y > -240) {
+                    currentAppState->ennemy->y -= 1;
+                    currentAppState->ennemy->justMovedLeft = 1;
+                    currentAppState->ennemy->appeared = 1;
+                }
+            }
+
+            // if (currentAppState->fireball->isOnScreen) {
+            //     currentAppState->fireball->y += 1;
+            // }
+
             // if (currentAppState->block->y + currentAppState->block->startX < 0 || currentAppState->block->y + currentAppState->block->startX > 160) {
             //     currentAppState->block->isOnScreen = 0;
             // } else {
@@ -120,7 +213,7 @@ AppState processAppState(AppState *currentAppState, u32 keysPressedBefore, u32 k
             // }
 
     }
-    if (KEY_DOWN((BUTTON_LEFT), keysPressedNow)) {
+    if (KEY_DOWN((BUTTON_LEFT), keysPressedNow) && currentAppState->x > 0) {
 
             currentAppState->ground.x += 1;
             currentAppState->block->y += 1;
@@ -132,22 +225,84 @@ AppState processAppState(AppState *currentAppState, u32 keysPressedBefore, u32 k
 
             currentAppState->x -= 1;
 
+            if (currentAppState->x + 240 >= currentAppState->lengthOfLevel) {
+                currentAppState->flag->y += 1;
+                currentAppState->flag->justMovedLeft = 1;
+            }
+
+            if (currentAppState->x + 100 >= currentAppState->lengthOfLevel) {
+                currentAppState->gameOver = 1;
+                currentAppState->win = 1;
+            }
+
+            if (!currentAppState->ennemy->dead && currentAppState->x + 240 >= currentAppState->ennemy->startX) {
+                if (currentAppState->ennemy->y > -240) {
+                    currentAppState->ennemy->y += 1;
+                    currentAppState->ennemy->justMovedLeft = 1;
+                }
+
+            }
+
+            if (currentAppState->fireball->isOnScreen) {
+                currentAppState->fireball->y += 1;
+            }
+
+
     }
     if (KEY_JUST_PRESSED((BUTTON_UP), keysPressedNow, keysPressedBefore)) {
-        if (currentAppState->mario.y > currentAppState->block->y + currentAppState->block->startX - currentAppState->mario.width && currentAppState->mario.y < currentAppState->block->y + currentAppState->block->startX + currentAppState->block->width + 1 && !currentAppState->block->isPopped) {
-            drawMarioJump(&(currentAppState->mario), (currentAppState->block));
-            currentAppState->score += 1000;
-            currentAppState->scoreJustChanged = 1;
-        } else if (currentAppState->mario.y > currentAppState->brick_block->y + currentAppState->brick_block->startX - currentAppState->mario.width && currentAppState->mario.y < currentAppState->brick_block->y + currentAppState->brick_block->startX + currentAppState->brick_block->width + 1 && !currentAppState->brick_block->isPopped) {
-            drawMarioJump(&(currentAppState->mario), (currentAppState->brick_block));
-            currentAppState->score += 1000;
-            currentAppState->scoreJustChanged = 1;
-        } else {
-            drawMarioJump(&(currentAppState->mario), 0);
+        if (currentAppState->mario.isJumpingUp < 7 && currentAppState->mario.isJumpingUp == 0) {
+            currentAppState->mario.x -= 3;
+            currentAppState->mario.isJumpingUp += 1;
+            // undrawMarioMovedUp(&currentAppState->mario);
         }
+
+
+
+    }
+    if (!currentAppState->ennemy->dead && currentAppState->x + 240 >= currentAppState->ennemy->startX) {
+        if (currentAppState->ennemy->y > -240) {
+            currentAppState->ennemy->y -= 1;
+            currentAppState->ennemy->realy += 1;
+            currentAppState->ennemy->justMovedLeft = 1;
+        }
+        if (!currentAppState->ennemy->dead && currentAppState->mario.x - 30 >= currentAppState->ennemy->y + 222 && currentAppState->mario.isJumpingUp == 0) {
+            currentAppState->gameOver = 1;
+        }
+    }
+
+
+    if (KEY_JUST_PRESSED((BUTTON_SELECT), keysPressedNow, keysPressedBefore)) {
+        //if win is set to 1 but not gameOver. It means reset.
+        currentAppState->win = 1;
+        currentAppState->gameOver = 0;
+
 
     }
 
+    if (currentAppState->fireball->isOnScreen) {
+        currentAppState->fireball->y += 1;
+        if (currentAppState->fireball->y >= currentAppState->ennemy->y + 222) {
+            currentAppState->ennemy->dead = 1;
+            drawRectDMA(currentAppState->ennemy->x, currentAppState->ennemy->y + 222, currentAppState->ennemy->width, currentAppState->ennemy->height, BACKGROUND);
+            //drawRectDMA(currentAppState->ennemy->x, currentAppState->ennemy->y, currentAppState->ennemy->width, currentAppState->ennemy->height, BACKGROUND);
+        }
+    }
+    if (!currentAppState->fireball->isOnScreen && KEY_JUST_PRESSED((BUTTON_A), keysPressedNow, keysPressedBefore)) {
+        currentAppState->fireball->isOnScreen = 1;
+        currentAppState->fireball->y = 65;
+    }
+    if (currentAppState->fireball->isOnScreen && currentAppState->fireball->y >= 232) {
+        currentAppState->fireball->isOnScreen = 0;
+        drawRectDMA(currentAppState->fireball->x, currentAppState->fireball->y, currentAppState->fireball->width, currentAppState->fireball->height, BACKGROUND);
+
+    }
+
+
+
+
+    // if (currentAppState->x > currentAppState->block + 150) {
+    //     currentAppState->block->prize = 10;
+    // }
     AppState nextAppState = *currentAppState;
 
     return nextAppState;
