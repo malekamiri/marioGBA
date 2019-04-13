@@ -16,8 +16,8 @@ typedef struct {
    int justMovedUp;
    int justMovedDown;
 
-   // int isJumpingUp;
-   // int isJumpingDown;
+   int isJumpingUp;
+   int isJumpingDown;
  } Mario;
 
  typedef struct {
@@ -32,6 +32,10 @@ typedef struct {
 
    int justMovedRight;
    int justMovedLeft;
+
+   int appeared;
+   int dead;
+   int realy;
  } Ennemy;
 
  typedef struct {
@@ -63,6 +67,17 @@ typedef struct {
     int prize;
  } Block;
 
+ typedef struct {
+    int height;
+    int width;
+    int x;
+    int y;
+    int justMovedRight;
+    int justMovedLeft;
+    int startX;
+    int isOnScreen;
+ } Fireball;
+
 typedef struct {
     // Store whether or not the game is over in this member:
     int gameOver;
@@ -88,7 +103,7 @@ typedef struct {
     Block *brick_block;
     Ennemy *ennemy;
     Flag *flag;
-
+    Fireball *fireball;
 
 } AppState;
 

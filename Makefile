@@ -17,7 +17,7 @@ PROGNAME = Game
 # line you would put main.o and myLib.o
 OFILES = gba.o font.o draw.o logic.o main.o images/garbage.o images/start_screen.o images/ground_block.o images/mario_character.o
 OFILES += images/prize_block.o images/prize_block_popped.o images/mario_character_blue.o images/mario_character_b.o images/flag_end.o
-OFILES += images/ennemy.o images/game_over.o images/game_win.o
+OFILES += images/ennemy.o images/game_over.o images/game_win.o images/fireball.o
 
 ################################################################################
 # These are various settings used to make the GBA toolchain work

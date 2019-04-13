@@ -2,7 +2,7 @@
 #include "gba.h"
 #include <stdio.h>
 #include <stdlib.h>
-
+#include "myLib.h"
 #include <math.h>
 
 #include "images/garbage.h"
@@ -15,6 +15,7 @@
 #include "images/mario_character_blue.h"
 
 #include "images/ennemy.h"
+#include "images/fireball.h"
 
 #include "images/flag_end.h"
 #include "images/game_over.h"
@@ -70,6 +71,24 @@ void undrawAppState(AppState *state) {
         state->scoreJustChanged = 0;
     }
 
+    if (state->ennemy->justMovedLeft) {
+        undrawEnnemyMovedLeft(state->ennemy);
+        state->ennemy->justMovedLeft = 0;
+    }
+
+    if (state->flag->justMovedRight) {
+        drawRectDMA(18, state->flag->y + 35, 1, 112, BACKGROUND);
+        state->flag->justMovedRight = 0;
+    }
+    if (state->flag->justMovedLeft) {
+        drawRectDMA(18, state->flag->y - 1, 1, 112, BACKGROUND);
+        state->flag->justMovedLeft = 0;
+    }
+
+
+    if (state->mario.isJumpingUp < 7 && state->mario.isJumpingUp >= 1) {
+        undrawMarioMovedUp(&state->mario);
+    }
 
     // drawGround(&(state->ground));
     // fillScreenDMA(BACKGROUND);
@@ -92,7 +111,6 @@ void drawAppState(AppState *state) {
     }
     if (state->brick_block->startX + state->brick_block->width > state->x) {
         drawBrickBlock((state->brick_block));
-
     }
 
         //    drawImageDMA(18, state->flag->y, 35, 112, flag_end);
@@ -102,7 +120,7 @@ void drawAppState(AppState *state) {
         drawImageDMA(18, state->flag->y, 35, 112, flag_end);
     }
 
-    if (state->x + 240 >= state->ennemy->startX && state->ennemy->y > -222) {
+    if (!state->ennemy->dead && (state->ennemy->appeared || (state->x + 240 >= state->ennemy->startX)) && state->ennemy->y > -222) {
         drawEnnemy(state->ennemy);
     }
     // draw the score
@@ -119,7 +137,14 @@ void drawAppState(AppState *state) {
             drawFullScreenImageDMA(game_over);
         }
     }
+
+    if (state->fireball->isOnScreen) {
+        drawImageDMA(state->fireball->x, state->fireball->y, state->fireball->width, state->fireball->height, fireball);
+        drawRectDMA(state->fireball->x, state->fireball->y, 1, state->fireball->height, BACKGROUND);
+    }
+
 }
+
 
 
 //This function draws the ground
@@ -190,6 +215,10 @@ void undrawMarioMovedDown(Mario *mario) {
 }
 
 
+void undrawEnnemyMovedLeft(Ennemy *ennemy) {
+    drawRectDMA(ennemy->x, 240 + ennemy->y, 1, ennemy->height, BACKGROUND);
+}
+
 void drawMarioJump(Mario *mario, Block *block) {
     for (int i = 0; i < 7; i++) {
         mario->x -= 3;
@@ -219,34 +248,34 @@ void drawMarioJump(Mario *mario, Block *block) {
 }
 
 void drawBlockJump(Block *block) {
-    for (int i = 0; i < 3; i++) {
-        block->x -= 3;
-        if (block->prize) {
-            drawImageDMA(block->x, block->y + block->startX, block->width, block->height, prize_block);
-        } else {
-            drawImageDMA(block->x, block->y + block->startX, block->width, block->height, ground_block);
-        }
+    // for (int i = 0; i < 3; i++) {
+    //     block->x -= 3;
+    //     if (block->prize) {
+    //         drawImageDMA(block->x, block->y + block->startX, block->width, block->height, prize_block);
+    //     } else {
+    //         drawImageDMA(block->x, block->y + block->startX, block->width, block->height, ground_block);
+    //     }
 
-        undrawBlockMovedUp(block);
-        volatile int x = 0;
-        for (int i = 0; i < 8000; i++) {
-                x++;
-        }
-    }
-    for (int i = 3; i > 0; i--) {
-        block->x += 3;
-        if (block->prize) {
-            drawImageDMA(block->x, block->y + block->startX, block->width, block->height, prize_block);
-        } else {
-            drawImageDMA(block->x, block->y + block->startX, block->width, block->height, ground_block);
-        }
-        undrawBlockMovedDown(block);
+    //     undrawBlockMovedUp(block);
+    //     // volatile int x = 0;
+    //     // for (int i = 0; i < 8000; i++) {
+    //     //         x++;
+    //     // }
+    // }
+    // for (int i = 3; i > 0; i--) {
+    //     block->x += 3;
+    //     if (block->prize) {
+    //         drawImageDMA(block->x, block->y + block->startX, block->width, block->height, prize_block);
+    //     } else {
+    //         drawImageDMA(block->x, block->y + block->startX, block->width, block->height, ground_block);
+    //     }
+    //     undrawBlockMovedDown(block);
 
-        volatile int x = 0;
-        for (int i = 0; i < 8000; i++) {
-                x++;
-        }
-    }
+    //     // volatile int x = 0;
+    //     // for (int i = 0; i < 8000; i++) {
+    //     //         x++;
+    //     // }
+    // }
     drawImageDMA(block->x, block->y + block->startX, block->width, block->height, prize_block_popped);
     block->isPopped = 1;
     //drawImageDMA(mario->x, mario->y, mario->width, mario->height, mario_character);
@@ -280,7 +309,6 @@ void drawBrickBlock(Block *block) {
 }
 
 void drawEnnemy(Ennemy *ennemy_mario) {
-
     drawImageDMA(ennemy_mario->x, ennemy_mario->y + 222, ennemy_mario->width, ennemy_mario->height, mario_ennemy);
 }
 

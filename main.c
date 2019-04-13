@@ -59,6 +59,9 @@ int main(void) {
 
                 // TA-TODO: Draw the start state here.
                 drawFullScreenImageDMA(start_screen);
+                drawRectDMA(153, 145, 50, 2, BACKGROUND);
+                drawRectDMA(147, 200, 30, 13, RED);
+                drawString(200, 150, "Malek", WHITE);
                 state = START_NODRAW;
 
                 break;
@@ -123,7 +126,12 @@ int main(void) {
                 break;
             case APP_EXIT_NODRAW:
                 // TA-TODO: Check for a button press here to go back to the start screen
-
+                for (int i = 0; i < 10; i++) {
+                    if (KEY_JUST_PRESSED((1<<i), currentButtons, previousButtons)) {
+                        state = START;
+                        break;
+                    }
+                }
                 break;
         }
 
